@@ -9,8 +9,10 @@ import kotlin.io.path.Path
 import kotlin.io.path.readLines
 
 
+
+
 var configs = listOf(
-    Styles()
+    Styles
 )
 
 fun genConfigs() {
@@ -18,10 +20,12 @@ fun genConfigs() {
 }
 
 // (Always re-invent the wheel, but make sure it's worse!)
-interface Config {
+abstract class Config {
 
-    fun getSavePath(): String
-    fun options(): HashMap<String, Any>
+    lateinit var loadedOptions: HashMap<String, String>;
+
+    abstract fun getSavePath(): String
+    abstract fun options(): HashMap<String, Any>
 
 
     fun getFullSavePath(): String {
@@ -46,6 +50,8 @@ interface Config {
         return Path(getFullSavePath()).readLines(Charset.defaultCharset())
     }
 
+
+
     fun getOptions(): HashMap<String, String> {
         val map = HashMap<String, String>()
         for (line in read()) {
@@ -63,6 +69,11 @@ interface Config {
         return map
     }
 
+    fun getOption(option: String): String {
+        return loadedOptions[option]!!
+    }
+
+
     fun generate() {
         val file = File(getFullSavePath())
 
@@ -71,6 +82,7 @@ interface Config {
         println(file.absolutePath)
 
         if (file.exists()) {
+            loadedOptions = getOptions()
             return
         }
 
@@ -89,8 +101,9 @@ interface Config {
         val bw = BufferedWriter(FileWriter(file))
         bw.write(write)
         bw.close()
+
+        loadedOptions = getOptions()
+
     }
-
-
 
 }

@@ -1,6 +1,6 @@
 package me.djdisaster.config
 
-class Styles : Config {
+object Styles : Config() {
 
 
     override fun getSavePath(): String {
@@ -8,9 +8,9 @@ class Styles : Config {
     }
 
     override fun options(): HashMap<String, Any> {
-        var map = HashMap<String, Any>()
+        val map = HashMap<String, Any>()
 
-        map.put("background-colour", "black")
+        map["background-colour"] = "black"
 
         return map
     }
