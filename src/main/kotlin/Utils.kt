@@ -46,20 +46,25 @@ private fun getColorLookupMap(): HashMap<String, Color> {
 
 
 fun String.toColor(): Color {
-
     try {
         val clazz = Color::class.javaObjectType
-        val field = clazz.getField(this)
+        val field = clazz.getField(this.uppercase(Locale.getDefault()))
         return field.get(null) as Color
-    } catch (ignored: Exception) {
+    } catch (ignored: Exception) { }
 
-    }
-
-
-    if (this == "#[0-9|a-f]{1,6}") {
-        return Color.decode(this)
+    val hexPattern = "#[0-9A-Fa-f]{6,8}".toRegex()
+    if (this.matches(hexPattern)) {
+        return if (this.length == 9) {
+            val alpha = Integer.valueOf(this.substring(1, 3), 16)
+            val red = Integer.valueOf(this.substring(3, 5), 16)
+            val green = Integer.valueOf(this.substring(5, 7), 16)
+            val blue = Integer.valueOf(this.substring(7, 9), 16)
+            Color(red, green, blue, alpha)
+        } else {
+            Color.decode(this)
+        }
     }
 
     return Color.PINK
-
 }
+
