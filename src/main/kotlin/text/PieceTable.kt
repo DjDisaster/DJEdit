@@ -1,5 +1,7 @@
 package me.djdisaster.piecetable
 
+// prob not actually needed ngl
+
 class PieceTable(var original: String) {
 
     private var addBuffer = ""

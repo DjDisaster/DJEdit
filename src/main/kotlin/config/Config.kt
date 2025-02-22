@@ -12,7 +12,7 @@ import kotlin.io.path.readLines
 
 
 var configs = listOf(
-    Styles
+    Styles, Syntax
 )
 
 fun genConfigs() {
@@ -25,7 +25,7 @@ abstract class Config {
     lateinit var loadedOptions: HashMap<String, String>;
 
     abstract fun getSavePath(): String
-    abstract fun options(): HashMap<String, Any>
+    abstract fun options(): HashMap<String, String>
 
 
     fun getFullSavePath(): String {
@@ -40,7 +40,6 @@ abstract class Config {
 
 
     fun write(str: String) {
-
         val writer = BufferedWriter(FileWriter(getFullSavePath()))
         writer.write(str)
         writer.close()
@@ -53,10 +52,10 @@ abstract class Config {
 
 
     fun getOptions(): HashMap<String, String> {
-        val map = HashMap<String, String>()
+        val map = options()
         for (line in read()) {
             val parsedLine = line.replaceFirst(": ", ":")
-            val split = parsedLine.split(":")
+            val split = parsedLine.split(":", limit = 2)
 
             if (split.size < 2) {
                 continue
@@ -95,7 +94,7 @@ abstract class Config {
         }
 
         println("saves at: ${getFullSavePath()}")
-        println("text: " + write)
+        println("text: $write")
 
         file.createNewFile()
         val bw = BufferedWriter(FileWriter(file))

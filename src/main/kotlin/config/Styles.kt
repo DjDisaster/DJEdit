@@ -7,10 +7,11 @@ object Styles : Config() {
         return "styles.yml"
     }
 
-    override fun options(): HashMap<String, Any> {
-        val map = HashMap<String, Any>()
+    override fun options(): HashMap<String, String> {
+        val map = HashMap<String, String>()
 
         map["background-colour"] = "black"
+        map["border-colour"] = "#00000000"
 
         return map
     }

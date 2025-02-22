@@ -4,6 +4,8 @@ import TextPane
 import me.djdisaster.config.Styles
 import me.djdisaster.toColor
 import java.awt.*
+import java.awt.event.ComponentAdapter
+import java.awt.event.ComponentEvent
 import javax.swing.JFrame
 import javax.swing.JPanel
 import javax.swing.SwingUtilities
@@ -31,7 +33,24 @@ object RootPane {
         textFrame.foreground = Color.PINK
 
 
+        frame.addComponentListener(object : ComponentAdapter() {
+            override fun componentResized(e: ComponentEvent) {
+                val newSize = frame.size
+                textFrame.preferredSize = newSize
+                textFrame.size = newSize
+                textFrame.revalidate()
+                textFrame.repaint()
+            }
+        })
+
+
 
         frame.isVisible = true
+
+
+
     }
+
+
+
 }
