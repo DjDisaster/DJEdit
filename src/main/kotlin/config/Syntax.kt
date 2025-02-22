@@ -1,6 +1,6 @@
 package me.djdisaster.config
 
-import me.djdisaster.toColor
+import me.djdisaster.misc.toColor
 import java.awt.Color
 
 object Syntax : Config() {

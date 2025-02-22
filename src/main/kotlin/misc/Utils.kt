@@ -1,4 +1,4 @@
-package me.djdisaster
+package me.djdisaster.misc
 
 import java.awt.Color
 import java.util.*
@@ -18,8 +18,8 @@ var operatingSystemSavePath = operatingSystemSavePaths[operatingSystem]
 
 fun genOperatingSystemPathMap(): HashMap<String, String> {
     val map = HashMap<String, String>()
-    map["linux"] = "~/.config/${appName}"
-    map["windows"] = "C:\\Users\\${username}\\AppData\\Roaming\\${appName}\\"
+    map["linux"] = "~/.config/$appName"
+    map["windows"] = "C:\\Users\\$username\\AppData\\Roaming\\$appName\\"
 
     return map
 }
@@ -67,4 +67,14 @@ fun String.toColor(): Color {
 
     return Color.PINK
 }
+
+fun String.getIndentation(): Int {
+    var point = 0
+    while (point < this.length && this[point] == '\t') {
+        point++
+    }
+    return point
+}
+
+
 

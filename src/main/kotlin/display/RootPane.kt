@@ -2,22 +2,32 @@ package me.djdisaster.display
 
 import TextPane
 import me.djdisaster.config.Styles
-import me.djdisaster.toColor
+import me.djdisaster.misc.toColor
 import java.awt.*
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
+import javax.swing.BorderFactory
 import javax.swing.JFrame
 import javax.swing.JPanel
-import javax.swing.SwingUtilities
+
 
 object RootPane {
 
-    private val frame = JFrame()
+    private val frame = JFrame("fun program")
     private val textFrame = TextPane()
     init {
 
         frame.isUndecorated = true
         frame.background = Styles.getOption("background-colour").toColor()
+
+        frame.rootPane.setBorder(BorderFactory.createMatteBorder(
+            Styles.getOption("border-top").toInt(),
+            Styles.getOption("border-left").toInt(),
+            Styles.getOption("border-bottom").toInt(),
+            Styles.getOption("border-right").toInt(),
+            Styles.getOption("border-colour").toColor())
+        );
+
 
         val dimensions = Toolkit.getDefaultToolkit().screenSize
         frame.size = dimensions

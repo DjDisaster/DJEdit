@@ -1,6 +1,6 @@
 package me.djdisaster.config
 
-import me.djdisaster.operatingSystemSavePath
+import me.djdisaster.misc.operatingSystemSavePath
 import java.io.BufferedWriter
 import java.io.File
 import java.io.FileWriter
