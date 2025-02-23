@@ -17,6 +17,7 @@ import javax.swing.text.StyleConstants
 class TextPane : JTextPane() {
 
     var document = styledDocument
+    val scrollPane = JScrollPane(this)
 
 
     val suggestionsPopup = JPopupMenu()
@@ -40,6 +41,11 @@ class TextPane : JTextPane() {
         suggestionScroll.isFocusable = false
         suggestionScroll.verticalScrollBarPolicy = JScrollPane.VERTICAL_SCROLLBAR_NEVER
         suggestionScroll.horizontalScrollBarPolicy = JScrollPane.HORIZONTAL_SCROLLBAR_NEVER
+
+        scrollPane.verticalScrollBarPolicy = JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED
+        scrollPane.horizontalScrollBarPolicy = JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED
+        scrollPane.isOpaque = false
+        scrollPane.viewport.isOpaque = false
 
 
         val popupBackgroundColour = Color.DARK_GRAY
@@ -68,6 +74,7 @@ class TextPane : JTextPane() {
         addKeyListener(object : KeyAdapter() {
             override fun keyTyped(e: KeyEvent) {
                 SwingUtilities.invokeLater {
+                    println("update")
                     updateSuggestions()
                 }
             }
@@ -93,6 +100,9 @@ class TextPane : JTextPane() {
                         }
                     }
                 }
+                SwingUtilities.invokeLater {
+                    updateSyntaxHighlighting()
+                }
             }
         })
 
@@ -105,7 +115,41 @@ class TextPane : JTextPane() {
         return match?.value ?: ""
     }
 
+    val infoPopup = JPopupMenu().apply {
+        isFocusable = false
+        setRequestFocusEnabled(false)
+        background = Color.GRAY
+        font = Font("", 0, 24)
+        border = BorderFactory.createEmptyBorder()
+    }
+
+
+
+    private fun showInfo(info: String) {
+        infoPopup.isVisible = true
+        infoPopup.removeAll()
+
+        val formattedInfo = "<html>" + info.replace("\n", "<br>").replace(" ", "&nbsp;") + "</html>"
+
+        val infoLabel = JLabel(formattedInfo).apply {
+            foreground = Color.WHITE
+            background = Color.DARK_GRAY
+            border = BorderFactory.createEmptyBorder()
+            font = Font("", Font.PLAIN, 20)
+            isOpaque = true
+        }
+
+        infoPopup.add(infoLabel)
+        val caretRect = modelToView(caretPosition)
+        infoPopup.show(this, caretRect.x, caretRect.y + font.size)
+    }
+
+
+
+
+
     private fun updateSuggestions() {
+        infoPopup.isVisible = false
         val currentWord = getCurrentWord()
         if (currentWord.isEmpty()) {
             suggestionsPopup.isVisible = false
@@ -119,8 +163,21 @@ class TextPane : JTextPane() {
                 if (function.arguments.size == 0) {
                     append += ")"
                 }
+
+
+
+
                 data.add(append)
             }
+            var splitWord = currentWord.split("(")
+
+            println("SW: " + splitWord[0])
+            if (splitWord[0] == function.functionName) {
+                println("pass")
+                showInfo(function.regLine + "\n" + function.body.replace("\t", "    "))
+                return;
+            }
+
         }
 
         if (data.isEmpty()) {
@@ -131,12 +188,11 @@ class TextPane : JTextPane() {
         suggestionsList.setListData(data)
         suggestionsList.selectedIndex = 0
 
-        // Calculate dynamic height
-        val itemHeight = suggestionsList.fixedCellHeight.takeIf { it > 0 } ?: 24 // Default to 24 if unset
-        val maxVisibleItems = 10 // Limit to avoid excessive height
+        val itemHeight = suggestionsList.fixedCellHeight.takeIf { it > 0 } ?: 24
+        val maxVisibleItems = 10
         val popupHeight = (data.size.coerceAtMost(maxVisibleItems) * itemHeight) + 5
 
-        suggestionScroll.preferredSize = Dimension(400, popupHeight) // Adjust width as needed
+        suggestionScroll.preferredSize = Dimension(400, popupHeight)
         suggestionScroll.revalidate()
         suggestionScroll.repaint()
 
@@ -156,6 +212,21 @@ class TextPane : JTextPane() {
         })
     }
 
+    fun insertSuggestion() {
+        val selected = suggestionsList.selectedValue ?: return
+        val caretPos = caretPosition
+        val text = text.substring(0, caretPos)
+        val match = Regex("\\b(\\w+)\$").find(text)
+
+        match?.let {
+            document.remove(it.range.first, it.range.last - it.range.first + 1)
+            document.insertString(it.range.first, selected, SimpleAttributeSet())
+        }
+
+        suggestionsPopup.isVisible = false
+    }
+
+
 
     override fun paintComponent(g: Graphics) {
         val g2 = g as Graphics2D
@@ -165,7 +236,7 @@ class TextPane : JTextPane() {
         super.paintComponent(g)
     }
 
-    fun updateVisibleRedHighlighting() {
+    fun updateSyntaxHighlighting() {
         val visibleRect = this.visibleRect
         val startOffset = viewToModel(Point(visibleRect.x, visibleRect.y))
         val endOffset = viewToModel(Point(visibleRect.x + visibleRect.width, visibleRect.y + visibleRect.height))
@@ -181,7 +252,7 @@ class TextPane : JTextPane() {
 
         document.setCharacterAttributes(startOffset, visibleLength, SimpleAttributeSet(), true)
 
-        println("visible: " + visibleText)
+        //println("visible: " + visibleText)
         for (entry in Syntax.getMatchPairs()) {
             val regex = entry.regex
             val matches = regex.findAll(text)
@@ -198,19 +269,6 @@ class TextPane : JTextPane() {
     }
 
 
-    fun insertSuggestion() {
-        val selected = suggestionsList.selectedValue ?: return
-        val caretPos = caretPosition
-        val text = text.substring(0, caretPos)
-        val match = Regex("\\b(\\w+)\$").find(text)
-
-        match?.let {
-            document.remove(it.range.first, it.range.last - it.range.first + 1)
-            document.insertString(it.range.first, selected, SimpleAttributeSet())
-        }
-
-        suggestionsPopup.isVisible = false
-    }
 
 
 }

@@ -10,7 +10,7 @@ object Syntax : Config() {
     override fun options(): HashMap<String, String> {
         return hashMapOf(
             "enabled" to "functions",
-            "functions-regex" to "function [A-Za-z]+\\(([A-Za-z0-9]+: [A-Za-z0-9]+(, [A-Za-z0-9]+: [A-Za-z0-9]+)*)?\\)",
+            "functions-regex" to "(function [A-z|0-9]+\\(([A-z|0-9]+\\: [A-z|0-9]+, )+[A-z|0-9]+\\: [A-z|0-9]+\\)|function [A-z|0-9]+\\([A-z|0-9]+\\: [A-z|0-9]+\\)|function [A-z|0-9]+\\(\\))( ?:: ?[A-z]+ ?)?:",
             "functions-colour" to "yellow"
         )
     }

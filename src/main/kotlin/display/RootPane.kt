@@ -36,11 +36,14 @@ object RootPane {
             override fun isOpaque(): Boolean = false
         }
 
-        frame.add(textFrame)
+        //frame.add(textFrame)
         textFrame.background = Color(0,0,0,0)
         textFrame.preferredSize = dimensions
         textFrame.margin = Insets(20,20,0,0)
         textFrame.foreground = Color.PINK
+
+        frame.add(textFrame.scrollPane)
+
 
 
         frame.addComponentListener(object : ComponentAdapter() {

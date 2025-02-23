@@ -108,9 +108,9 @@ fun parseFunction(it: ListIterator<String>, line: String): LoadedFunction {
         it.previous()
     }
 
-    return LoadedFunction(name, arguments, returnType, body)
+    return LoadedFunction(name, arguments, returnType, body, line)
 }
 
 
-class LoadedFunction(var functionName: String, var arguments: List<FunctionArgument>, var returnType: String, var body: String)
+class LoadedFunction(var functionName: String, var arguments: List<FunctionArgument>, var returnType: String, var body: String, var regLine: String)
 class FunctionArgument(var name: String, var type: String)
