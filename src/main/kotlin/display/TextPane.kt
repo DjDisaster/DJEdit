@@ -1,18 +1,13 @@
 import me.djdisaster.config.Syntax
 import me.djdisaster.misc.DirectoryController
 import java.awt.*
-import java.awt.event.ComponentAdapter
-import java.awt.event.ComponentEvent
-import java.awt.event.KeyAdapter
-import java.awt.event.KeyEvent
-import java.awt.event.KeyListener
-import java.awt.event.MouseAdapter
-import java.awt.event.MouseEvent
+import java.awt.event.*
 import java.util.Vector
 import java.util.regex.Pattern
 import javax.swing.*
 import javax.swing.text.SimpleAttributeSet
 import javax.swing.text.StyleConstants
+import javax.swing.undo.UndoManager
 
 class TextPane : JTextPane() {
 
@@ -24,6 +19,7 @@ class TextPane : JTextPane() {
     val suggestionsList = JList<String>()
     val suggestionScroll = JScrollPane(suggestionsList)
 
+    val undoManager = UndoManager()
 
     init {
         isOpaque = false
@@ -100,11 +96,29 @@ class TextPane : JTextPane() {
                         }
                     }
                 }
+
+                if (e.isControlDown) {
+                    if (e.keyCode == KeyEvent.VK_Z) {
+                        if (undoManager.canUndo()) {
+                            undoManager.undo()
+                        }
+                    } else if (e.keyCode == KeyEvent.VK_Y) {
+                        if (undoManager.canRedo()) {
+                            undoManager.redo()
+                        }
+                    }
+
+                }
+
                 SwingUtilities.invokeLater {
                     updateSyntaxHighlighting()
                 }
             }
         })
+
+        document.addUndoableEditListener { event ->
+            undoManager.addEdit(event.edit)
+        }
 
     }
 
